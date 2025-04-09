@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let history = { extract: [], wheel: [], table: [], explore: [], recolor: [] };
     let redoStack = { extract: [], wheel: [], table: [], explore: [], recolor: [] };
     let currentTab = 'extract';
+    let originalSvgContent = null; // Armazena o SVG original
 
     // Alternância de Tema
     const themeToggle = document.getElementById('theme-toggle');
@@ -153,24 +154,38 @@ document.addEventListener('DOMContentLoaded', () => {
         if (file) {
             const reader = new FileReader();
             reader.onload = (event) => {
+                originalSvgContent = event.target.result; // Armazena o SVG original
                 svgPreview.innerHTML = event.target.result;
                 const svg = svgPreview.querySelector('svg');
                 const colors = extractSvgColors(svg);
                 renderPalette(colors, svgPalette, null, 'recolor', (hex, block) => {
+                    const colorWrapper = document.createElement('div');
+                    colorWrapper.style.display = 'flex';
+                    colorWrapper.style.flexDirection = 'column';
+                    colorWrapper.style.alignItems = 'center';
+
+                    const text = document.createElement('span');
+                    text.innerHTML = `${hex}<br>RGB: ${hexToRgb(hex).join(', ')}`;
+                    colorWrapper.appendChild(text);
+
                     const input = document.createElement('input');
                     input.type = 'color';
                     input.value = hex;
                     input.addEventListener('input', () => {
-                        updateSvgColor(svg, hex, input.value);
+                        updateSvgColor(svg, hex, input.value); // Atualiza o SVG
                         block.style.backgroundColor = input.value;
-                        block.innerHTML = `${input.value}<br>RGB: ${hexToRgb(input.value).join(', ')}`;
+                        text.innerHTML = `${input.value}<br>RGB: ${hexToRgb(input.value).join(', ')}`;
                         const currentColors = history.recolor[history.recolor.length - 1];
                         const index = currentColors.findIndex(c => rgbToHex(c[0], c[1], c[2]) === hex);
                         if (index !== -1) {
                             currentColors[index] = hexToRgb(input.value);
+                            hex = input.value; // Atualiza a referência da cor antiga
                         }
                     });
-                    block.appendChild(input);
+                    colorWrapper.appendChild(input);
+
+                    block.innerHTML = '';
+                    block.appendChild(colorWrapper);
                 });
                 history.recolor.push([...colors]);
                 redoStack.recolor = [];
@@ -261,7 +276,7 @@ document.addEventListener('DOMContentLoaded', () => {
             menu.innerHTML = `
                 <button class="download-option" data-format="jpeg">JPEG</button>
                 <button class="download-option" data-format="png">PNG</button>
-                <button class="download-option" data-format="svg">SVG</button>
+                <button class="download-option" data-format="svg">SVG (Original e Recolorido)</button>
                 <button class="download-option" data-format="pdf">PDF</button>
             `;
             document.body.appendChild(menu);
@@ -396,19 +411,30 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateSvgColor(svg, oldColor, newColor) {
-        svg.querySelectorAll(`[fill="${oldColor}"]`).forEach(el => el.setAttribute('fill', newColor));
+        svg.querySelectorAll(`[fill="${oldColor}"]`).forEach(el => {
+            el.setAttribute('fill', newColor);
+        });
     }
 
     window.downloadFile = function(format) {
         const svg = document.querySelector('#svg-preview svg');
         if (!svg) return;
         if (format === 'svg') {
+            // Download do SVG recolorido
             const serializer = new XMLSerializer();
-            const source = serializer.serializeToString(svg);
-            const link = document.createElement('a');
-            link.href = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(source)));
-            link.download = 'XperiColor_recolored.svg';
-            link.click();
+            const recoloredSource = serializer.serializeToString(svg);
+            const recoloredLink = document.createElement('a');
+            recoloredLink.href = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(recoloredSource)));
+            recoloredLink.download = 'XperiColor_recolored.svg';
+            recoloredLink.click();
+
+            // Download do SVG original
+            if (originalSvgContent) {
+                const originalLink = document.createElement('a');
+                originalLink.href = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(originalSvgContent)));
+                originalLink.download = 'XperiColor_original.svg';
+                setTimeout(() => originalLink.click(), 500);
+            }
         } else if (format === 'pdf') {
             const doc = new jsPDF();
             const width = svg.width.baseVal.value;
