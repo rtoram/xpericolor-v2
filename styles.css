@@ -67,10 +67,14 @@ h1 {
 .content {
     display: none;
     padding: 20px;
+    max-height: calc(100vh - 150px); /* Limita altura para caber na tela */
+    overflow-y: auto; /* Rolagem apenas se necessário */
 }
 
 .content.active {
-    display: block;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
 
 .upload-area {
@@ -101,6 +105,7 @@ input[type="file"] {
 
 #image-preview img, #svg-preview svg {
     max-width: 300px;
+    max-height: 300px; /* Limita altura do SVG */
     margin: 20px auto;
     display: block;
 }
@@ -116,6 +121,14 @@ input[type="file"] {
     flex-wrap: wrap;
     gap: 10px;
     margin-top: 20px;
+}
+
+#svg-palette {
+    position: sticky;
+    bottom: 20px; /* Mantém a paleta visível na parte inferior */
+    background: var(--card-bg);
+    padding: 10px;
+    z-index: 1;
 }
 
 .color-block {
@@ -134,6 +147,10 @@ input[type="file"] {
 
 .color-block:hover {
     transform: scale(1.05);
+}
+
+.color-block input[type="color"] {
+    margin-top: 5px;
 }
 
 #color-wheel {
@@ -190,5 +207,9 @@ footer {
     }
     #image-preview img, #svg-preview svg {
         max-width: 100%;
+    }
+    #svg-palette {
+        position: relative; /* Evita problemas em telas pequenas */
+        bottom: 0;
     }
 }
