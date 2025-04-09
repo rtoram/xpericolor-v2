@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XperiColor</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.0/color-thief.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+    <header>
+        <h1>XperiColor</h1>
+        <div class="toolbar">
+            <button id="undo" title="Desfazer">⟲</button>
+            <button id="redo" title="Refazer">⟳</button>
+            <button id="fullscreen" title="Tela Cheia">⤢</button>
+            <button id="share" title="Compartilhar">↷</button>
+            <button id="download" title="Baixar">↓</button>
+            <button id="instructions" title="Instruções">?</button>
+            <button id="theme-toggle" title="Alternar Tema">☀️</button>
+        </div>
+    </header>
+
+    <main>
+        <nav class="tabs">
+            <button class="tab active" data-tab="extract">Extrair Temas</button>
+            <button class="tab" data-tab="wheel">Disco de Cores</button>
+            <button class="tab" data-tab="table">Tabela Cromática</button>
+            <button class="tab" data-tab="explore">Explorar</button>
+            <button class="tab" data-tab="recolor">Recolorir SVG</button>
+        </nav>
+
+        <section id="extract" class="content active">
+            <div class="upload-area">
+                <input type="file" id="image-upload" accept="image/*">
+                <label for="image-upload">Escolha ou arraste uma imagem</label>
+                <button id="replace-image" title="Substituir Imagem">↻</button>
+            </div>
+            <select id="extract-filter">
+                <option value="none">Nenhum</option>
+                <option value="colorful">Colorido</option>
+                <option value="soft">Brilho Suave</option>
+                <option value="deep">Profundo</option>
+                <option value="dark">Escuro</option>
+            </select>
+            <div id="image-preview"></div>
+            <div id="color-palette"></div>
+            <div id="variations" class="variations"></div>
+        </section>
+
+        <section id="wheel" class="content">
+            <div id="color-wheel">
+                <input type="color" id="base-color" value="#FF5733">
+                <select id="harmony">
+                    <option value="analogous">Análogo</option>
+                    <option value="monochromatic">Monocromático</option>
+                    <option value="triad">Tríade</option>
+                    <option value="complementary">Complementar</option>
+                </select>
+                <div id="harmony-palette"></div>
+            </div>
+        </section>
+
+        <section id="table" class="content">
+            <div id="color-table"></div>
+            <div id="table-variations" class="variations"></div>
+        </section>
+
+        <section id="explore" class="content">
+            <input type="text" id="explore-search" placeholder="Pesquisar por nome ou HEX">
+            <div id="explore-gallery"></div>
+        </section>
+
+        <section id="recolor" class="content">
+            <div class="upload-area">
+                <input type="file" id="svg-upload" accept=".svg">
+                <label for="svg-upload">Escolha ou arraste um SVG</label>
+            </div>
+            <div id="svg-preview"></div>
+            <div id="svg-palette"></div>
+        </section>
+
+        <div id="instructions-modal" class="modal">
+            <div class="modal-content">
+                <h2>Instruções de Uso</h2>
+                <p>Bem-vindo ao XperiColor!<br>
+                - <b>Extrair Temas:</b> Faça upload de uma imagem, aplique filtros (Colorido, Brilho Suave, etc.) e veja as cores extraídas. Clique em uma cor para variações.<br>
+                - <b>Disco de Cores:</b> Escolha uma cor base e harmonia para criar paletas.<br>
+                - <b>Tabela Cromática:</b> Explore tons predefinidos e clique para variações.<br>
+                - <b>Explorar:</b> Busque paletas prontas e use-as em outras abas.<br>
+                - <b>Recolorir SVG:</b> Carregue um SVG, ajuste cores e baixe em JPEG, PNG, SVG ou PDF.<br>
+                - <b>Ferramentas:</b> Desfazer/Refazer ações, compartilhar via URL ou QR code, baixar resultados. Alterne entre temas Claro/Escuro.</p>
+                <button id="close-modal">Fechar</button>
+            </div>
+        </div>
+
+        <div id="share-modal" class="modal">
+            <div class="modal-content">
+                <h2>Compartilhar Paleta</h2>
+                <p>Copie o link ou escaneie o QR code:</p>
+                <input type="text" id="share-url" readonly>
+                <div id="qrcode"></div>
+                <button id="close-share">Fechar</button>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>Criado por XperiGrok, todos os direitos reservados 2025</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
